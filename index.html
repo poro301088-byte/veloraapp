@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VELORA CAFFE — نظام التشغيل (MP7 Foundation)</title>
+  <style>
+    :root {
+      --bg-main: #0c0a09;
+      --bg-card: #181412;
+      --bg-card-hover: #221c19;
+      --bg-input: #120f0d;
+      --gold: #d4af37;
+      --gold-soft: rgba(212, 175, 55, 0.16);
+      --gold-border: rgba(212, 175, 55, 0.35);
+      --text-main: #f5f0e8;
+      --text-muted: #b5a897;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --border: #2c241f;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top, #1d1611 0%, var(--bg-main) 65%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-bottom: 40px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 18px 16px;
+    }
+
+    header.topbar {
+      background: rgba(24, 20, 18, 0.92);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .brand h1 {
+      color: var(--gold);
+      font-size: 1.45rem;
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      background: var(--gold-soft);
+      color: var(--gold);
+      border: 1px solid var(--gold-border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      color: var(--gold);
+      margin: 18px 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .role-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px 14px;
+      border-radius: 12px;
+      text-align: right;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .role-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--gold-border);
+    }
+
+    .role-btn.active {
+      background: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold);
+    }
+
+    .role-btn strong {
+      font-size: 0.98rem;
+      color: var(--text-main);
+    }
+
+    .role-btn span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 9px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--gold);
+      color: #120f0d;
+      border-color: var(--gold);
+    }
+
+    .panel {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .cards-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .info-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .info-card h4 {
+      color: var(--gold);
+      margin-bottom: 6px;
+      font-size: 0.98rem;
+    }
+
+    .info-card p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 11px 14px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .checklist-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .checklist-item.done label {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #120f0d;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold-border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.86rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat-box span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .stat-box strong {
+      font-size: 1.15rem;
+      color: var(--gold);
+    }
+
+    .log-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-ok {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .status-diff {
+      color: var(--danger);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <h1>VELORA CAFFE</h1>
+        <p>نظام التشغيل والمتابعة اليومية — MP7 Foundation</p>
+      </div>
+      <span class="badge" id="activeRoleBadge">الدور النشط: الأونر (Owner)</span>
+    </header>
+
+    <div class="section-title">
+      <span>اختر الدور التشغيلي (8 أدوار)</span>
+    </div>
+    <div class="roles-grid" id="rolesGrid"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="manuals">الدليل وصلاحيات الكتب</button>
+      <button class="tab-btn" data-tab="checklist">قائمة المتابعة</button>
+      <button class="tab-btn" data-tab="cash">جرد الكاش</button>
+      <button class="tab-btn" data-tab="reports">النواقص والهدر</button>
+    </div>
+
+    <!-- تبويب الدليل والصلاحيات -->
+    <section class="panel active" id="tab-manuals">
+      <h3 id="roleOverviewTitle" style="color: var(--gold); margin-bottom: 6px;"></h3>
+      <p id="roleOverviewDesc" style="color: var(--text-muted); margin-bottom: 14px;"></p>
+      <h4 style="font-size: 0.95rem; color: var(--text-main);">الكتب والأدلة المتاحة لهذا الدور:</h4>
+      <div class="cards-list" id="manualsList"></div>
+    </section>
+
+    <!-- تبويب قائمة المتابعة -->
+    <section class="panel" id="tab-checklist">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+        <h3 style="color: var(--gold);">مهام الوردية والمتابعة</h3>
+        <button class="btn-secondary" id="resetChecklistBtn">إعادة ضبط القائمة</button>
+      </div>
+      <div id="checklistContainer"></div>
+    </section>
+
+    <!-- تبويب جرد الكاش -->
+    <section class="panel" id="tab-cash">
+      <h3 style="color: var(--gold); margin-bottom: 12px;">حاسبة جرد الكاش والوردية</h3>
+      <div class="form-grid">
+        <div>
+          <label class="field-label" for="openingCash">رصيد بداية الوردية</label>
+          <input type="number" id="openingCash" value="0" min="0" step="0.5" />
+        </div>
+        <div>
+          <label class="field-label" for="cashSales">مبيعات الكاش</label>
+          <input type="number" id="cashSales" value="0" min="0" step="0.5" />
+        </div>
+        <div>
+          <label class="field-label" for="cashExpenses">مصروفات / مسحوبات نقدية</label>
+          <input type="number" id="cashExpenses" value="0" min="0" step="0.5" />
+        </div>
+        <div>
+          <label class="field-label" for="actualCash">النقد الفعلي بالدرج</label>
+          <input type="number" id="actualCash" value="0" min="0" step="0.5" />
+        </div>
+      </div>
+      <button class="btn-primary" id="saveCashBtn">حفظ جرد الوردية</button>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <span>المتوقع بالدرج</span>
+          <strong id="expectedCash">0.00</strong>
+        </div>
+        <div class="stat-box">
+          <span>الفرق (زيادة / عجز)</span>
+          <strong id="diffCash">0.00</strong>
+        </div>
+        <div class="stat-box">
+          <span>الحالة</span>
+          <strong id="cashStatus" class="status-ok">مطابق</strong>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <h4 style="color: var(--gold); margin-bottom: 8px; font-size: 0.95rem;">سجل الجرد المحفوظ</h4>
+        <div id="cashHistoryList"></div>
+      </div>
+    </section>
+
+    <!-- تبويب النواقص والهدر -->
+    <section class="panel" id="tab-reports">
+      <h3 style="color: var(--gold); margin-bottom: 12px;">تسجيل بلاغ نواقص أو هدر</h3>
+      <div class="form-grid">
+        <div>
+          <label class="field-label" for="reportType">نوع البلاغ</label>
+          <select id="reportType">
+            <option value="نواقص">نواقص مخزون / خامات</option>
+            <option value="هدر">هدر / تالف</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="reportItem">الصنف / الخامة</label>
+          <input type="text" id="reportItem" placeholder="مثال: حليب، أكواب، بن إسبريسو" />
+        </div>
+        <div>
+          <label class="field-label" for="reportQty">الكمية / الملاحظة</label>
+          <input type="text" id="reportQty" placeholder="مثال: متبقي كرتون واحد" />
+        </div>
+      </div>
+      <button class="btn-primary" id="addReportBtn">إرسال البلاغ</button>
+
+      <div style="margin-top: 18px;">
+        <h4 style="color: var(--gold); margin-bottom: 8px; font-size: 0.95rem;">البلاغات المسجلة</h4>
+        <div id="reportsList"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const ROLES = [
+      {
+        id: "owner",
+        name: "الأونر (Owner)",
+        subtitle: "إشراف عام ومراجعة التقارير",
+        desc: "متابعة الأداء العام للفرع، مراجعة تقارير الكاش والهدر، واعتماد الخطط التشغيلية.",
+        manuals: [
+          { title: "دليل الأونر (الاونر.pdf)", summary: "مؤشرات الأداء، الرقابة المالية، ومتابعة جودة التشغيل." },
+          { title: "دليل المدير (المدير.pdf)", summary: "الاطلاع على آليات إدارة الورديات وتوزيع المهام." }
+        ],
+        tasks: [
+          "مراجعة ملخص مبيعات وجرد الكاش اليومي",
+          "الاطلاع على تقارير الهدر والنواقص الحرجة",
+          "اعتماد ملاحظات التشغيل اليومية"
+        ]
+      },
+      {
+        id: "manager",
+        name: "المدير (Manager)",
+        subtitle: "إدارة الورديات والرقابة اليومية",
+        desc: "تنسيق فرق العمل، ضبط جاهزية الفرع قبل الافتتاح، ومتابعة الإغلاق والرقابة.",
+        manuals: [
+          { title: "دليل المدير (المدير.pdf)", summary: "إدارة الورديات، متابعة الالتزام، ومعالجة الأعطال اليومية." },
+          { title: "دليل الكاشير والمساعد", summary: "مراجعة ضوابط الدرج والتسويات المالية." }
+        ],
+        tasks: [
+          "التأكد من اكتمال طاقم الوردية وجاهزية المحطات",
+          "مراجعة معايير النظافة وجودة الخدمة أثناء الذروة",
+          "اعتماد جرد الكاش وإغلاق الوردية"
+        ]
+      },
+      {
+        id: "barista",
+        name: "باريستا (Barista)",
+        subtitle: "تحضير المشروبات ومعايرة الإسبريسو",
+        desc: "ضبط معايرة المطحنة والماكينة، تحضير المشروبات وفق الوصفات، والحفاظ على نظافة البار.",
+        manuals: [
+          { title: "دليل الباريستا (باريستا.pdf)", summary: "معايير الاستخلاص، تبخير الحليب، وسرعة التحضير." }
+        ],
+        tasks: [
+          "معايرة الإسبريسو وفحص درجة حرارة وضغط الماكينة",
+          "تجهيز الحليب والثلج والسيورب قبل ضغط الطلبات",
+          "تنظيف وتصريف ماكينة الإسبريسو والمطحنة في الإغلاق"
+        ]
+      },
+      {
+        id: "waiter",
+        name: "الويتر (Waiter)",
+        subtitle: "خدمة الصالة والطاولات",
+        desc: "استقبال الضيوف، تقديم القوائم، خدمة الطاولات، والحفاظ على ترتيب الصالة.",
+        manuals: [
+          { title: "دليل الويتر (الويتر.pdf)", summary: "آداب الضيافة، سرعة تقديم الطلبات، وترتيب الطاولات." }
+        ],
+        tasks: [
+          "ترتيب وتنظيف الطاولات وتجهيز القوائم",
+          "استقبال الضيوف ومتابعة رضا الطاولات",
+          "رفع الأطباق والأكواب الفارغة فوراً"
+        ]
+      },
+      {
+        id: "captain",
+        name: "كابتن أوردر (Captain Order)",
+        subtitle: "تنسيق الطلبات وتوجيه الصالة",
+        desc: "متابعة تدفق الطلبات بين الصالة والبار، وتوجيه فريق الخدمة لضمان سلاسة الحركة.",
+        manuals: [
+          { title: "دليل كابتن أوردر (كابتن اوردر.pdf)", summary: "إدارة أولوية الطلبات وتنسيق الصالة والبار." }
+        ],
+        tasks: [
+          "مراجعة دقة الطلبات قبل خروجها للضيوف",
+          "توزيع ضغط الطاولات على فريق الخدمة",
+          "الإبلاغ الفوري عن أي تأخير أو نواقص"
+        ]
+      },
+      {
+        id: "cashier",
+        name: "كاشير ومساعد (Cashier)",
+        subtitle: "نقاط البيع وجرد الكاش",
+        desc: "إدخال الطلبات بدقة، تحصيل المدفوعات، وتصفية الدرج ومطابقة الكاش.",
+        manuals: [
+          { title: "دليل كاشير ومساعد (كاشير ومساعد.pdf)", summary: "إجراءات الكاشير، الفواتير، وجرد نهاية الوردية." }
+        ],
+        tasks: [
+          "فحص الفكة والدرج قبل بدء الوردية",
+          "مطابقة المدفوعات النقدية والإلكترونية",
+          "تسجيل جرد الكاش في نهاية الوردية"
+        ]
+      },
+      {
+        id: "car_service",
+        name: "خدمة السيارات (Car Service)",
+        subtitle: "طلبات السيارات وتسليم الطلبات",
+        desc: "استقبال طلبات السيارات وتسليمها بسرعة وأمان مع الحفاظ على انسيابية المسار.",
+        manuals: [
+          { title: "دليل خدمة السيارات (خدمه السيارت.pdf)", summary: "معايير خدمة السيارات، السلامة، وسرعة التسليم." }
+        ],
+        tasks: [
+          "تنظيم مسار السيارات ومنع التكدس",
+          "التأكد من مطابقة الطلب قبل تسليمه للعميل",
+          "تنظيف منطقة خدمة السيارات وتجهيز أدوات التسليم"
+        ]
+      },
+      {
+        id: "steward",
+        name: "الاستيورد (Steward)",
+        subtitle: "النظافة والتعقيم وتجهيز الأدوات",
+        desc: "غسيل وتعقيم الأكواب والأدوات، دعم المخزون اليومي، والحفاظ على بيئة عمل نظيفة.",
+        manuals: [
+          { title: "دليل الاستيورد والنظافة", summary: "بروتوكول التعقيم، غسيل الأدوات، وإدارة النفايات." }
+        ],
+        tasks: [
+          "توفير الأكواب والأدوات النظيفة والمعقمة للبار والصالة",
+          "إدارة النفايات والهدر وفق معايير السلامة",
+          "تنظيف أرضيات ومناطق التحضير بشكل دوري"
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = "velora_caffe_state_v1";
+    let state = {
+      activeRoleId: "owner",
+      checks: {},
+      cashLogs: [],
+      reports: []
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {
+        console.warn("Storage unavailable:", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Storage save failed:", e);
+      }
+    }
+
+    function getCurrentRole() {
+      return ROLES.find((r) => r.id === state.activeRoleId) || ROLES[0];
+    }
+
+    function renderRoles() {
+      const grid = document.getElementById("rolesGrid");
+      grid.innerHTML = "";
+      ROLES.forEach((role) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "role-btn" + (role.id === state.activeRoleId ? " active" : "");
+        btn.innerHTML = `<strong>${role.name}</strong><span>${role.subtitle}</span>`;
+        btn.addEventListener("click", () => {
+          state.activeRoleId = role.id;
+          saveState();
+          renderAll();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderManuals() {
+      const role = getCurrentRole();
+      document.getElementById("activeRoleBadge").textContent = `الدور النشط: ${role.name}`;
+      document.getElementById("roleOverviewTitle").textContent = role.name;
+      document.getElementById("roleOverviewDesc").textContent = role.desc;
+
+      const list = document.getElementById("manualsList");
+      list.innerHTML = role.manuals
+        .map(
+          (m) => `
+          <div class="info-card">
+            <h4>${m.title}</h4>
+            <p>${m.summary}</p>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderChecklist() {
+      const role = getCurrentRole();
+      const container = document.getElementById("checklistContainer");
+      const roleChecks = state.checks[role.id] || {};
+
+      container.innerHTML = role.tasks
+        .map((task, idx) => {
+          const key = `${role.id}_${idx}`;
+          const checked = Boolean(roleChecks[key]);
+          return `
+            <div class="checklist-item ${checked ? "done" : ""}" data-key="${key}">
+              <label for="${key}" style="flex:1; cursor:pointer;">${task}</label>
+              <input type="checkbox" id="${key}" ${checked ? "checked" : ""} />
+            </div>
+          `;
+        })
+        .join("");
+
+      container.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        input.addEventListener("change", (e) => {
+          const key = e.target.id;
+          if (!state.checks[role.id]) state.checks[role.id] = {};
+          state.checks[role.id][key] = e.target.checked;
+          saveState();
+          renderChecklist();
+        });
+      });
+    }
+
+    function calculateCash() {
+      const opening = parseFloat(document.getElementById("openingCash").value) || 0;
+      const sales = parseFloat(document.getElementById("cashSales").value) || 0;
+      const expenses = parseFloat(document.getElementById("cashExpenses").value) || 0;
+      const actual = parseFloat(document.getElementById("actualCash").value) || 0;
+
+      const expected = opening + sales - expenses;
+      const diff = actual - expected;
+
+      document.getElementById("expectedCash").textContent = expected.toFixed(2);
+      const diffEl = document.getElementById("diffCash");
+      const statusEl = document.getElementById("cashStatus");
+
+      diffEl.textContent = (diff > 0 ? "+" : "") + diff.toFixed(2);
+
+      if (Math.abs(diff) < 0.005) {
+        statusEl.textContent = "مطابق";
+        statusEl.className = "status-ok";
+      } else if (diff > 0) {
+        statusEl.textContent = "زيادة";
+        statusEl.className = "status-ok";
+      } else {
+        statusEl.textContent = "عجز";
+        statusEl.className = "status-diff";
+      }
+
+      return { opening, sales, expenses, actual, expected, diff };
+    }
+
+    function renderCashHistory() {
+      const list = document.getElementById("cashHistoryList");
+      if (!state.cashLogs.length) {
+        list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.88rem;">لا توجد سجلات جرد محفوظة بعد.</p>`;
+        return;
+      }
+
+      list.innerHTML = state.cashLogs
+        .slice()
+        .reverse()
+        .map(
+          (item) => `
+          <div class="log-item">
+            <div>
+              <strong>${item.roleName}</strong> — متوقع: ${item.expected.toFixed(2)} | فعلي: ${item.actual.toFixed(2)}
+              <div style="color: var(--text-muted); font-size: 0.78rem;">${item.time}</div>
+            </div>
+            <span class="${item.diff < 0 ? "status-diff" : "status-ok"}">
+              ${item.diff > 0 ? "+" : ""}${item.diff.toFixed(2)}
+            </span>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderReports() {
+      const list = document.getElementById("reportsList");
+      if (!state.reports.length) {
+        list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.88rem;">لا توجد بلاغات نواقص أو هدر مسجلة.</p>`;
+        return;
+      }
+
+      list.innerHTML = state.reports
+        .slice()
+        .reverse()
+        .map(
+          (rep) => `
+          <div class="log-item">
+            <div>
+              <strong style="color: var(--gold);">[${rep.type}]</strong> ${rep.item} — <span>${rep.qty || "بدون كمية"}</span>
+              <div style="color: var(--text-muted); font-size: 0.78rem;">بواسطة: ${rep.roleName} • ${rep.time}</div>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderAll() {
+      renderRoles();
+      renderManuals();
+      renderChecklist();
+      calculateCash();
+      renderCashHistory();
+      renderReports();
+    }
+
+    // التبويبات
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // إعادة ضبط قائمة المتابعة
+    document.getElementById("resetChecklistBtn").addEventListener("click", () => {
+      const role = getCurrentRole();
+      state.checks[role.id] = {};
+      saveState();
+      renderChecklist();
+    });
+
+    // حساب الكاش لحظياً وحفظه
+    ["openingCash", "cashSales", "cashExpenses", "actualCash"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", calculateCash);
+    });
+
+    document.getElementById("saveCashBtn").addEventListener("click", () => {
+      const calc = calculateCash();
+      const role = getCurrentRole();
+      state.cashLogs.push({
+        ...calc,
+        roleName: role.name,
+        time: new Date().toLocaleString("ar-EG")
+      });
+      saveState();
+      renderCashHistory();
+    });
+
+    // إضافة بلاغ نواقص أو هدر
+    document.getElementById("addReportBtn").addEventListener("click", () => {
+      const type = document.getElementById("reportType").value;
+      const itemInput = document.getElementById("reportItem");
+      const qtyInput = document.getElementById("reportQty");
+      const item = itemInput.value.trim();
+      const qty = qtyInput.value.trim();
+
+      if (!item) return;
+
+      const role = getCurrentRole();
+      state.reports.push({
+        type,
+        item,
+        qty,
+        roleName: role.name,
+        time: new Date().toLocaleString("ar-EG")
+      });
+      itemInput.value = "";
+      qtyInput.value = "";
+      saveState();
+      renderReports();
+    });
+
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>
